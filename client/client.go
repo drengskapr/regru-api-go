@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/drengskapr/regru-api-go/connector"
+	"github.com/drengskapr/regru-api-go/internal/connector"
 )
 
 // ApiRequest makes a POST request with the given fields and returns the response body.
