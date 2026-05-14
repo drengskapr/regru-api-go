@@ -6,6 +6,7 @@ Currently only several zone (domain) control functions implemented in this modul
 ```bash
 "zone/get_resource_records"
 "zone/add_txt"
+"zone/add_alias"
 "zone/remove_record"
 ```
 API documentation https://www.reg.ru/reseller/api2doc#common
@@ -59,7 +60,28 @@ func main() {
 	// Add an A record
 	// c.AddARr("mydomain.com", "www", "1.2.3.4")
 
-	// Remove a record
+	// Remove a record by subdomain and type (removes all matching records)
 	// c.RmRr("mydomain.com", "_acme_example", "TXT", "")
+
+	// Remove a specific record by subdomain, type, and content
+	// c.RmRr("mydomain.com", "_acme_example", "TXT", "txt-record-content")
 }
 ```
+
+## Testing
+
+Unit and integration tests are included. Integration tests require live credentials and a whitelisted IP — they skip automatically when env vars are unset.
+
+```bash
+# Unit tests only (no credentials needed)
+go test ./...
+
+# Integration tests against the live API
+export API_USERNAME="your-regru-username"
+export API_PASSWORD="your-regru-password"
+export API_DOMAIN="yourdomain.com"
+
+go test ./internal/zonecontrol/ -v
+```
+
+Integration tests create and remove records under fixed subdomains (`_regru_api_test`, `_regru_api_test_content`, `test-a-record`). Existing records are not touched.
