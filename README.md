@@ -35,7 +35,7 @@ package main
 
 import (
 	"os"
-	"github.com/daloman/regru-api-go/zonecontrol"
+	"github.com/drengskapr/regru-api-go/zonecontrol"
 )
 
 var username, password, domainName string
