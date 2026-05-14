@@ -35,16 +35,18 @@ package main
 import (
 	"fmt"
 	"os"
-	"github.com/drengskapr/regru-api-go/zonecontrol"
+
+	regru "github.com/drengskapr/regru-api-go"
 )
 
 func main() {
-	username := os.Getenv("API_USERNAME")
-	password := os.Getenv("API_PASSWORD")
-	domainName := "mydomain.com"
+	c := regru.New(
+		os.Getenv("API_USERNAME"),
+		os.Getenv("API_PASSWORD"),
+	)
 
 	// Get DNS resource records
-	rec, err := zonecontrol.GetZones(username, password, domainName)
+	rec, err := c.GetZones("mydomain.com")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
@@ -52,12 +54,12 @@ func main() {
 	fmt.Printf("result: %s\n", rec.Result)
 
 	// Add a TXT record
-	// zonecontrol.AddTxtRr(username, password, domainName, "_acme_foo_bar", "txt-record-content")
+	// c.AddTxtRr("mydomain.com", "_acme_foo_bar", "txt-record-content")
 
 	// Add an A record
-	// zonecontrol.AddARr(username, password, domainName, "www", "1.2.3.4")
+	// c.AddARr("mydomain.com", "www", "1.2.3.4")
 
 	// Remove a record
-	// zonecontrol.RmRr(username, password, domainName, "_acme_example", "TXT", "")
+	// c.RmRr("mydomain.com", "_acme_example", "TXT", "")
 }
 ```
