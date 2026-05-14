@@ -82,8 +82,8 @@ func AddTxtRr(username, password, domainName, subdomain, textBody string) (dnsRe
 	return parseResponse(body)
 }
 
-// RmTxtRr removes a resource record for domain.
-func RmTxtRr(username, password, domainName, subdomain, resourceRecordType, content string) (dnsRecords, error) {
+// RmRr removes a resource record for domain.
+func RmRr(username, password, domainName, subdomain, resourceRecordType, content string) (dnsRecords, error) {
 	postFields := map[string]string{
 		"username":    username,
 		"password":    password,
