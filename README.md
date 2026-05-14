@@ -6,6 +6,7 @@ Currently only several zone (domain) control functions implemented in this modul
 ```bash
 "zone/get_resource_records"
 "zone/add_txt"
+"zone/add_alias"
 "zone/remove_record"
 ```
 API documentation https://www.reg.ru/reseller/api2doc#common
@@ -30,102 +31,57 @@ Access configuration https://www.reg.ru/user/account/#/settings/api/
 ## Examples
 
 ```go
-// Get domain information
 package main
 
 import (
+	"fmt"
 	"os"
-	"github.com/daloman/regru-api-go/zonecontrol"
+
+	regru "github.com/drengskapr/regru-api-go"
 )
 
-var username, password, domainName string
-
 func main() {
+	c := regru.New(
+		os.Getenv("API_USERNAME"),
+		os.Getenv("API_PASSWORD"),
+	)
 
-	username = os.Getenv("API_USERNAME")
-	password = os.Getenv("API_PASSWORD")
-	domainName = "mydomain.com"
-	
-   zonecontrol.GetZones(username, password, domainName)
-   
-   // Create TXT resource record
-   //zonecontrol.AddTxtRr(username, password, domainName, "_acme_foo_bar", "txt-record-content")
-   // Remove TXT resource record
-	//zonecontrol.RmTxtRr(username, password, domainName, "_acme_example", "TXT", "")
+	// Get DNS resource records
+	rec, err := c.GetZones("mydomain.com")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("result: %s\n", rec.Result)
+
+	// Add a TXT record
+	// c.AddTxtRr("mydomain.com", "_acme_foo_bar", "txt-record-content")
+
+	// Add an A record
+	// c.AddARr("mydomain.com", "www", "1.2.3.4")
+
+	// Remove a record by subdomain and type (removes all matching records)
+	// c.RmRr("mydomain.com", "_acme_example", "TXT", "")
+
+	// Remove a specific record by subdomain, type, and content
+	// c.RmRr("mydomain.com", "_acme_example", "TXT", "txt-record-content")
 }
-
 ```
 
-# Known Issues
-Test API returns some fields as strings for test access and as int for real data, and vice versa.
+## Testing
 
-Response for real account:
-```json
-{
-   "answer" : {
-      "domains" : [
-         {
-            "dname" : "example.xyz",
-            "result" : "success",
-            "rrs" : [
-               {
-                  "content" : "111.222.111.222",
-                  "prio" : 0,
-                  "rectype" : "A",
-                  "state" : "A",
-                  "subname" : "@"
-               },
-            ],
-            "service_id" : "12345678",
-            "servtype" : "domain",
-            "soa" : {
-               "minimum_ttl" : "10m",
-               "ttl" : "10m"
-            }
-         }
-      ]
-   },
-   "charset" : "utf-8",
-   "messagestore" : null,
-   "result" : "success"
-}
+Unit and integration tests are included. Integration tests require live credentials and a whitelisted IP — they skip automatically when env vars are unset.
 
-```
-Response for test account:
-```json
-{
-   "answer" : {
-      "domains" : [
-         {
-            "dname" : "example.com",
-            "result" : "success",
-            "rrs" : [
-               {
-                  "content" : "111.222.111.222",
-                  "prio" : "0",
-                  "rectype" : "A",
-                  "state" : "A",
-                  "subname" : "www"
-               }
-            ],
-            "service_id" : 12345,
-            "servtype" : "domain",
-            "soa" : {
-               "minimum_ttl" : "12h",
-               "ttl" : "1d"
-            }
-         }
-      ]
-   },
-   "charset" : "utf-8",
-   "messagestore" : null,
-   "result" : "success"
-}
+```bash
+# Unit tests only (no credentials needed)
+go test ./...
 
+# Integration tests against the live API
+export API_USERNAME="your-regru-username"
+export API_PASSWORD="your-regru-password"
+export API_DOMAIN="yourdomain.com"
+
+go test ./internal/zonecontrol/ -v
 ```
 
-```json
-WARN[0000] Could not unmarshal json: json: cannot unmarshal string into Go struct field rrsData.answer.Domains.Rrs.Prio of type int 
-INFO[0000] The answer is: {Answer:{Domains:[{Dname:mydomain.pro ErrorCode: ErrorText: ErrorParams:map[] Result:success Rrs:[{Content:111.222.111.222 Prio:0 Rectype:A State:A Subname:www}] ServiceId: Servtype:domain Soa:map[minimum_ttl:12h ttl:1d]}]} Charset:utf-8 Messagestore: Result:success ErrorCode: ErrorText: ErrorParams:map[]}
-
-```
+Integration tests create and remove records under fixed subdomains (`_regru_api_test`, `_regru_api_test_content`, `test-a-record`). Existing records are not touched.

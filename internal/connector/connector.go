@@ -5,8 +5,7 @@ import (
 	"time"
 )
 
-// NewConnection init Client connection using httpProxy
-// if env variable is defined.
+// NewConnection initialises an HTTP client with proxy support from environment.
 func NewConnection() *http.Client {
 	tr := &http.Transport{
 		MaxIdleConns:       10,
@@ -14,6 +13,5 @@ func NewConnection() *http.Client {
 		DisableCompression: true,
 		Proxy:              http.ProxyFromEnvironment,
 	}
-
 	return &http.Client{Transport: tr, Timeout: 10 * time.Second}
 }
