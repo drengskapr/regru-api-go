@@ -3,7 +3,7 @@ package zonecontrol
 import (
 	"encoding/json"
 
-	"github.com/drengskapr/regru-api-go/client"
+	"github.com/drengskapr/regru-api-go/internal/client"
 )
 
 type rrsData struct {
