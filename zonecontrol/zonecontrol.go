@@ -30,7 +30,7 @@ type answerDomains struct {
 	Domains []domainData
 }
 
-type dnsRecords struct {
+type DnsRecords struct {
 	Answer       answerDomains     `json:"answer,omitempty"`
 	Charset      string            `json:"charset,omitempty"`
 	Messagestore string            `json:"messagestore,omitempty"`
@@ -46,14 +46,14 @@ const zoneAddTxt = "zone/add_txt"
 const zoneRemoveRrs = "zone/remove_record"
 const zoneAddAlias = "zone/add_alias"
 
-func parseResponse(rawData []byte) (dnsRecords, error) {
-	b := dnsRecords{}
+func parseResponse(rawData []byte) (DnsRecords, error) {
+	b := DnsRecords{}
 	err := json.Unmarshal(rawData, &b)
 	return b, err
 }
 
 // GetZones returns resource records for domain.
-func GetZones(username, password, domainName string) (dnsRecords, error) {
+func GetZones(username, password, domainName string) (DnsRecords, error) {
 	postFields := map[string]string{
 		"username":    username,
 		"password":    password,
@@ -61,13 +61,13 @@ func GetZones(username, password, domainName string) (dnsRecords, error) {
 	}
 	body, err := client.ApiRequest(apiUrl+zoneGetRrs, postFields)
 	if err != nil {
-		return dnsRecords{}, err
+		return DnsRecords{}, err
 	}
 	return parseResponse(body)
 }
 
 // AddTxtRr adds a TXT resource record for domain.
-func AddTxtRr(username, password, domainName, subdomain, textBody string) (dnsRecords, error) {
+func AddTxtRr(username, password, domainName, subdomain, textBody string) (DnsRecords, error) {
 	postFields := map[string]string{
 		"username":    username,
 		"password":    password,
@@ -77,13 +77,13 @@ func AddTxtRr(username, password, domainName, subdomain, textBody string) (dnsRe
 	}
 	body, err := client.ApiRequest(apiUrl+zoneAddTxt, postFields)
 	if err != nil {
-		return dnsRecords{}, err
+		return DnsRecords{}, err
 	}
 	return parseResponse(body)
 }
 
 // RmRr removes a resource record for domain.
-func RmRr(username, password, domainName, subdomain, resourceRecordType, content string) (dnsRecords, error) {
+func RmRr(username, password, domainName, subdomain, resourceRecordType, content string) (DnsRecords, error) {
 	postFields := map[string]string{
 		"username":    username,
 		"password":    password,
@@ -96,13 +96,13 @@ func RmRr(username, password, domainName, subdomain, resourceRecordType, content
 	}
 	body, err := client.ApiRequest(apiUrl+zoneRemoveRrs, postFields)
 	if err != nil {
-		return dnsRecords{}, err
+		return DnsRecords{}, err
 	}
 	return parseResponse(body)
 }
 
 // AddARr adds an A resource record for domain.
-func AddARr(username, password, domainName, subdomain, ipAddr string) (dnsRecords, error) {
+func AddARr(username, password, domainName, subdomain, ipAddr string) (DnsRecords, error) {
 	postFields := map[string]string{
 		"username":    username,
 		"password":    password,
@@ -112,7 +112,7 @@ func AddARr(username, password, domainName, subdomain, ipAddr string) (dnsRecord
 	}
 	body, err := client.ApiRequest(apiUrl+zoneAddAlias, postFields)
 	if err != nil {
-		return dnsRecords{}, err
+		return DnsRecords{}, err
 	}
 	return parseResponse(body)
 }
