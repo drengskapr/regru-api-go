@@ -35,31 +35,63 @@ func TestGetZones(t *testing.T) {
 
 	GetZones(username, password, domain)
 
-	if !strings.Contains(buf.String(), "success") {
-		t.Errorf("expected log to contain 'success', got: %s", buf.String())
+	if !strings.Contains(buf.String(), "Result:success") {
+		t.Errorf("expected log to contain 'Result:success', got: %s", buf.String())
 	}
 }
 
-func TestAddTxtRr(t *testing.T) {
+func TestTxtRrLifecycle(t *testing.T) {
 	username, password, domain := credentials(t)
 	buf, restore := captureLog(t)
 	defer restore()
 
+	// Register cleanup to guarantee removal even if test fails
+	t.Cleanup(func() {
+		RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "")
+	})
+
+	// Add TXT record
 	AddTxtRr(username, password, domain, "_regru_api_test", "regru-api-go-test")
 
-	if !strings.Contains(buf.String(), "success") {
-		t.Errorf("expected log to contain 'success', got: %s", buf.String())
+	if !strings.Contains(buf.String(), "Result:success") {
+		t.Errorf("expected log to contain 'Result:success' after Add, got: %s", buf.String())
+	}
+
+	// Reset buffer for next operation
+	buf.Reset()
+
+	// Remove TXT record with empty content
+	RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "")
+
+	if !strings.Contains(buf.String(), "Result:success") {
+		t.Errorf("expected log to contain 'Result:success' after Rm, got: %s", buf.String())
 	}
 }
 
-func TestRmTxtRr(t *testing.T) {
+func TestTxtRrLifecycleWithContent(t *testing.T) {
 	username, password, domain := credentials(t)
 	buf, restore := captureLog(t)
 	defer restore()
 
-	RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "")
+	// Register cleanup to guarantee removal even if test fails
+	t.Cleanup(func() {
+		RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "regru-api-go-test")
+	})
 
-	if !strings.Contains(buf.String(), "success") {
-		t.Errorf("expected log to contain 'success', got: %s", buf.String())
+	// Add TXT record
+	AddTxtRr(username, password, domain, "_regru_api_test", "regru-api-go-test")
+
+	if !strings.Contains(buf.String(), "Result:success") {
+		t.Errorf("expected log to contain 'Result:success' after Add, got: %s", buf.String())
+	}
+
+	// Reset buffer for next operation
+	buf.Reset()
+
+	// Remove TXT record with non-empty content
+	RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "regru-api-go-test")
+
+	if !strings.Contains(buf.String(), "Result:success") {
+		t.Errorf("expected log to contain 'Result:success' after Rm with content, got: %s", buf.String())
 	}
 }
