@@ -1,16 +1,15 @@
 package client
 
 import (
+	"fmt"
 	"io"
 	"net/url"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/drengskapr/regru-api-go/connector"
 )
 
-// ApiRequest make any POST request with default API settings and return response body.
-func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
+// ApiRequest makes a POST request with the given fields and returns the response body.
+func ApiRequest(reqUrl string, postFields map[string]string) ([]byte, error) {
 	postData := url.Values{}
 	for k, v := range postFields {
 		postData.Add(k, v)
@@ -19,18 +18,16 @@ func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
 	c := connector.NewConnection()
 	res, err := c.PostForm(reqUrl, postData)
 	if err != nil {
-		log.Errorf("Connection error: %v", err)
-
-		return
+		return nil, err
 	}
 	defer res.Body.Close()
 
-	body, err = io.ReadAll(res.Body)
-	if res.StatusCode > 299 {
-		log.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
-	return body
+	if res.StatusCode > 299 {
+		return nil, fmt.Errorf("response failed with status %d: %s", res.StatusCode, body)
+	}
+	return body, nil
 }

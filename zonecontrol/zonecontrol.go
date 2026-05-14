@@ -49,51 +49,57 @@ const zoneRemoveRrs = "zone/remove_record"
 
 // GetZones return resource records for domain.
 func GetZones(username, password, domainName string) {
-	apiFunc := zoneGetRrs
-	reqUrl := apiUrl + apiFunc
-	// Create data map for POST request
-	postFields := make(map[string]string)
-	postFields["username"] = username
-	postFields["password"] = password
-	postFields["domain_name"] = domainName
-
-	answer := client.ApiRequest(reqUrl, postFields)
-	unmarshalRsponse(answer)
+	reqUrl := apiUrl + zoneGetRrs
+	postFields := map[string]string{
+		"username":    username,
+		"password":    password,
+		"domain_name": domainName,
+	}
+	body, err := client.ApiRequest(reqUrl, postFields)
+	if err != nil {
+		log.Errorf("API request failed: %v", err)
+		return
+	}
+	unmarshalRsponse(body)
 }
 
 // AddTxtRr add TXT resource record for domain.
 func AddTxtRr(username, password, domainName, subdomain, textBody string) {
-	apiFunc := zoneAddTxt
-	reqUrl := apiUrl + apiFunc
-
-	postFields := make(map[string]string)
-	postFields["username"] = username
-	postFields["password"] = password
-	postFields["domain_name"] = domainName
-	postFields["subdomain"] = subdomain
-	postFields["text"] = textBody
-
-	answer := client.ApiRequest(reqUrl, postFields)
-	unmarshalRsponse(answer)
+	reqUrl := apiUrl + zoneAddTxt
+	postFields := map[string]string{
+		"username":    username,
+		"password":    password,
+		"domain_name": domainName,
+		"subdomain":   subdomain,
+		"text":        textBody,
+	}
+	body, err := client.ApiRequest(reqUrl, postFields)
+	if err != nil {
+		log.Errorf("API request failed: %v", err)
+		return
+	}
+	unmarshalRsponse(body)
 }
 
 // RmTxtRr remove TXT resource record for domain.
 func RmTxtRr(username, password, domainName, subdomain, resourceRecordType, content string) {
-	apiFunc := zoneRemoveRrs
-	reqUrl := apiUrl + apiFunc
-
-	postFields := make(map[string]string)
-	postFields["username"] = username
-	postFields["password"] = password
-	postFields["domain_name"] = domainName
-	postFields["subdomain"] = subdomain
-	postFields["record_type"] = resourceRecordType
+	reqUrl := apiUrl + zoneRemoveRrs
+	postFields := map[string]string{
+		"username":    username,
+		"password":    password,
+		"domain_name": domainName,
+		"subdomain":   subdomain,
+		"record_type": resourceRecordType,
+	}
 	if content != "" {
 		postFields["content"] = content
 	}
-
-	answer := client.ApiRequest(reqUrl, postFields)
-	unmarshalRsponse(answer)
+	body, err := client.ApiRequest(reqUrl, postFields)
+	if err != nil {
+		log.Errorf("API request failed: %v", err)
+		return
+	}
+	unmarshalRsponse(body)
 }
 
 // unmarshalRsponse returns API answer as JSON structure.
