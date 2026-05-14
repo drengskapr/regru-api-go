@@ -5,7 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/daloman/regru-api-go/client"
+	"github.com/drengskapr/regru-api-go/client"
 )
 
 type rrsData struct {

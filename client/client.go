@@ -6,7 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/daloman/regru-api-go/connector"
+	"github.com/drengskapr/regru-api-go/connector"
 )
 
 // ApiRequest make any POST request with default API settings and return response body.
