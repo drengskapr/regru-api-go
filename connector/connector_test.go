@@ -33,4 +33,8 @@ func TestNewConnection(t *testing.T) {
 	if !tr.DisableCompression {
 		t.Error("expected DisableCompression true")
 	}
+
+	if tr.Proxy == nil {
+		t.Error("expected Proxy to be set (http.ProxyFromEnvironment)")
+	}
 }

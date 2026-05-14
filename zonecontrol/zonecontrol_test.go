@@ -20,6 +20,8 @@ func credentials(t *testing.T) (username, password, domain string) {
 	return
 }
 
+// captureLog redirects logrus global output to a buffer. These tests must not
+// be run in parallel (no t.Parallel) because SetOutput mutates shared state.
 func captureLog(t *testing.T) (*bytes.Buffer, func()) {
 	t.Helper()
 	buf := &bytes.Buffer{}
@@ -75,11 +77,11 @@ func TestTxtRrLifecycleWithContent(t *testing.T) {
 
 	// Register cleanup to guarantee removal even if test fails
 	t.Cleanup(func() {
-		RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "regru-api-go-test")
+		RmTxtRr(username, password, domain, "_regru_api_test_content", "TXT", "regru-api-go-test")
 	})
 
 	// Add TXT record
-	AddTxtRr(username, password, domain, "_regru_api_test", "regru-api-go-test")
+	AddTxtRr(username, password, domain, "_regru_api_test_content", "regru-api-go-test")
 
 	if !strings.Contains(buf.String(), "Result:success") {
 		t.Errorf("expected log to contain 'Result:success' after Add, got: %s", buf.String())
@@ -89,7 +91,7 @@ func TestTxtRrLifecycleWithContent(t *testing.T) {
 	buf.Reset()
 
 	// Remove TXT record with non-empty content
-	RmTxtRr(username, password, domain, "_regru_api_test", "TXT", "regru-api-go-test")
+	RmTxtRr(username, password, domain, "_regru_api_test_content", "TXT", "regru-api-go-test")
 
 	if !strings.Contains(buf.String(), "Result:success") {
 		t.Errorf("expected log to contain 'Result:success' after Rm with content, got: %s", buf.String())
