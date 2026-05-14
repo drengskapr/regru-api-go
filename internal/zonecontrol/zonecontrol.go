@@ -6,7 +6,7 @@ import (
 	"github.com/drengskapr/regru-api-go/internal/client"
 )
 
-type rrsData struct {
+type DnsRr struct {
 	Content string
 	Prio    int
 	Rectype string
@@ -14,24 +14,24 @@ type rrsData struct {
 	Subname string
 }
 
-type domainData struct {
+type DnsDomain struct {
 	Dname       string
 	ErrorCode   string
 	ErrorText   string
 	ErrorParams map[string]string
 	Result      string
-	Rrs         []rrsData
+	Rrs         []DnsRr
 	ServiceId   string
 	Servtype    string
 	Soa         map[string]string
 }
 
-type answerDomains struct {
-	Domains []domainData
+type DnsAnswer struct {
+	Domains []DnsDomain
 }
 
 type DnsRecords struct {
-	Answer       answerDomains     `json:"answer,omitempty"`
+	Answer       DnsAnswer         `json:"answer,omitempty"`
 	Charset      string            `json:"charset,omitempty"`
 	Messagestore string            `json:"messagestore,omitempty"`
 	Result       string            `json:"result,omitempty"`
